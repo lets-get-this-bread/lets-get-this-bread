@@ -1,6 +1,6 @@
 import os
 from flask import Flask, request
-from twilio.twiml.voice_response import VoiceResponse, Dial, Say
+from twilio.twiml.voice_response import VoiceResponse, Dial, Say, Record
 from twilio.twiml.messaging_response import MessagingResponse
 from twilio.rest import Client
 
@@ -39,6 +39,7 @@ def call_xml():
 
 @app.route("/voice", methods=['GET', 'POST'])
 def voice():
+    call_sid = request.values.get("CallSid", None)
     """Respond to incoming phone calls and mention the caller's city"""
     if request.values.get("FromState", None) in forbidden_states:
         resp = VoiceResponse()
@@ -46,7 +47,9 @@ def voice():
         resp.hangup()
         return str(resp)
     else:
-        resp = call_xml()
+        resp = VoiceResponse()
+        resp.say("Thank you for calling Ivylands Bakery. Please hold until the next representative is available.")
+        resp.record()
         return str(resp)
 
 if __name__ == "__main__":
